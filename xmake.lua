@@ -1,8 +1,8 @@
 -- info to change
-local name = "commonlibsse-ng-template"
+local name = "SkeletonAutoPatch"
 local author = "monitor221hz"
-local description = "SKSE64 plugin template using CommonLibSSE-NG"
-local version = "0.0.0"
+local description = "SKSE64 plugin that patches behavior to be compatible with any version of any skeleton mod."
+local version = "1.0.0"
 local license = "GPL-3.0"
 
 -- set minimum xmake version

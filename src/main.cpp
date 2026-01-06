@@ -1,3 +1,4 @@
+#include "hook.h"
 void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 {
 	switch (a_msg->type) {
@@ -22,6 +23,7 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
 	if (!messaging->RegisterListener("SKSE", MessageHandler)) {
 		return false;
 	}
+	SkeletonAutoPatch::InstallHooks();
 
 	return true;
 }

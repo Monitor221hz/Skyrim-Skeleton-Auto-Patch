@@ -10,9 +10,29 @@ namespace SkeletonAutoPatch
     void BlenderGeneratorActivateHook::Activate(RE::hkbBlenderGenerator *a_generator, const RE::hkbContext &a_context)
     {
         _Activate(a_generator, a_context); 
+
         auto* character = a_context.character; 
 
         if (!character) { return; }
+
+        auto setup = character->setup;
+        if (setup)
+        {
+            auto data = setup->data;
+            if (data)
+            {
+                auto stringData = data->stringData;
+                if (stringData)
+                {
+                    auto characterName = stringData->name.c_str();
+                    if (characterName && characterName[0] != '\0' && (strcmp(characterName, "FirstPerson") == 0))
+                    {
+                        SKSE::log::info("Skipping Bone Switch Generator Activate for FirstPerson");
+                        return;
+                    }
+                }
+            }
+        }
 
         for(auto& child : a_generator->children)
         {
@@ -23,7 +43,7 @@ namespace SkeletonAutoPatch
                 auto& bindings = variableBindingSet->bindings;
                 for (auto &binding : bindings)
                 {
-                    if (_strcmpi(binding.memberPath.c_str(), "boneWeights") == 0)
+                    if (strcmp(binding.memberPath.c_str(), "boneWeights") == 0)
                     {
                         areWeightsBound = true; 
                         break; 
@@ -50,9 +70,26 @@ namespace SkeletonAutoPatch
     {
         _Activate(a_generator, a_context); 
         auto* character = a_context.character; 
-
         if (!character) { return; }
 
+        auto setup = character->setup;
+        if (setup)
+        {
+            auto data = setup->data;
+            if (data)
+            {
+                auto stringData = data->stringData;
+                if (stringData)
+                {
+                    auto characterName = stringData->name.c_str();
+                    if (characterName && characterName[0] != '\0' && (strcmp(characterName, "FirstPerson") == 0))
+                    {
+                        SKSE::log::info("Skipping Bone Switch Generator Activate for FirstPerson");
+                        return;
+                    }
+                }
+            }
+        }
         for(auto& child : a_generator->ChildrenA)
         {
             auto variableBindingSet = child->variableBindingSet;
@@ -62,7 +99,7 @@ namespace SkeletonAutoPatch
                 auto& bindings = variableBindingSet->bindings;
                 for (auto &binding : bindings)
                 {
-                    if (_strcmpi(binding.memberPath.c_str(), "spBoneWeight") == 0)
+                    if (strcmp(binding.memberPath.c_str(), "spBoneWeight") == 0)
                     {
                         areWeightsBound = true; 
                         break; 

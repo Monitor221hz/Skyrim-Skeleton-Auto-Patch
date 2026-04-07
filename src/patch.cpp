@@ -33,7 +33,22 @@ namespace SkeletonAutoPatch
     }
     bool Patcher::PatchCharacter(RE::hkbCharacterSetup *a_setup, RE::hkbCharacterData *a_data)
     {
-         auto skeleton = a_setup->animationSkeleton;
+        auto data = a_setup->data;
+        if (data)
+        {
+            auto stringData = data->stringData;
+            if (stringData)
+            {
+                auto characterName = stringData->name.c_str();
+                if (characterName && characterName[0] != '\0' && (strcmp(characterName, "FirstPerson") == 0))
+                {
+                    SKSE::log::info("Skipping Patch Character for FirstPerson");
+                    return false;
+                }
+            }
+        }
+
+        auto skeleton = a_setup->animationSkeleton;
         if (!skeleton)
         {
             return false;

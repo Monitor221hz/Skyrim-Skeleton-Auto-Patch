@@ -105,8 +105,8 @@ Down	o	.pdata:000000014353E014	RUNTIME_FUNCTION <rva hkbCharacterSetup__sub_140A
     {
         SKSE::AllocTrampoline(14); 
         InitHavokHook::Install();
-        BlenderGeneratorActivateHook::Install();
-        BoneSwitchActivateHook::Install();
+        // BlenderGeneratorActivateHook::Install();
+        // BoneSwitchActivateHook::Install();
         // AnimationFileManagerHook::Install();
 
     }

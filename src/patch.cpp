@@ -1,6 +1,7 @@
 #include "patch.h"
 #include "RE/H/hkbVariableValueSet.h"
 #include "RE/H/hkClass.h"
+#include "RE/H/hkbVariableInfo.h"
 namespace SkeletonAutoPatch
 {
     bool Patcher::PatchBoneWeights(RE::hkbCharacter *a_character, RE::hkbBoneWeightArray *a_array)
@@ -33,6 +34,7 @@ namespace SkeletonAutoPatch
     }
     bool Patcher::PatchCharacter(RE::hkbCharacterSetup *a_setup, RE::hkbCharacterData *a_data)
     {
+        bool humanoid = false; 
         auto data = a_setup->data;
         if (data)
         {
@@ -40,10 +42,17 @@ namespace SkeletonAutoPatch
             if (stringData)
             {
                 auto characterName = stringData->name.c_str();
-                if (characterName && characterName[0] != '\0' && (strcmp(characterName, "FirstPerson") == 0))
+                if (characterName && characterName[0] != '\0')
                 {
-                    SKSE::log::info("Skipping Patch Character for FirstPerson");
-                    return false;
+                    if ( (strcmp(characterName, "FirstPerson") == 0))
+                    {
+                        SKSE::log::info("Skipping Patch Character for FirstPerson");
+                        return false;
+                    }
+                    if ((strcmp(characterName, "DefaultMale") == 0) || (strcmp(characterName, "DefaultFemale") == 0))
+                    {
+                        humanoid = true; 
+                    }
                 }
             }
         }
@@ -85,10 +94,10 @@ namespace SkeletonAutoPatch
         {
             return false;
         }
-
         auto& variants = variableValueSet->variantVariableValues;
-        for(auto& variant : variants)
+        for(int i = 0; i < variants.size(); i++)
         {
+            auto& variant = variants[i];
             /* I have yet to see a vanilla behavior project that doesn't use bone weight arrays exclusively in variants. If this ever changes, 
                this needs to be changed to include a class check but class getter seems nonexistent for bone arrays. */
             auto* boneWeightArray = reinterpret_cast<RE::hkRefPtr<RE::hkbBoneWeightArray>*>(&variant)->get();
@@ -96,6 +105,13 @@ namespace SkeletonAutoPatch
             {
                 continue;
             }
+            if (humanoid && humanoidOverrides.contains(i))
+            {
+                SKSE::log::info("Applying override for index {}", i);
+                PatchBoneWeights(skeleton.get(), mirroredSkeletonInfo, boneWeightArray, false, humanoidOverrides[i]);
+                continue;
+            }
+
             PatchBoneWeights(skeleton.get(), mirroredSkeletonInfo, boneWeightArray);
         }
         return true;
@@ -115,7 +131,7 @@ namespace SkeletonAutoPatch
         }
         return PatchCharacter(setup.get(), data.get());
     }
-    bool Patcher::PatchBoneWeights(const RE::hkaSkeleton *a_skeleton, RE::hkbMirroredSkeletonInfo *a_mirroredSkeletonInfo, RE::hkbBoneWeightArray *a_boneWeightArray, bool majorityRule)
+    bool Patcher::PatchBoneWeights(const RE::hkaSkeleton *a_skeleton, RE::hkbMirroredSkeletonInfo *a_mirroredSkeletonInfo, RE::hkbBoneWeightArray *a_boneWeightArray, bool majorityRule, float overrideWeight)
     {
         if (!a_skeleton)
         {
@@ -129,7 +145,7 @@ namespace SkeletonAutoPatch
         }
 
 
-        float defaultWeight = majorityRule ?  GetDefaultWeight(boneWeights) : 0.f;
+        float defaultWeight = majorityRule ?  GetDefaultWeight(boneWeights) : overrideWeight;
         int boneWeightCount = boneWeights.size();
         int missingWeightCount = a_skeleton->bones.size() - boneWeightCount;
         if (missingWeightCount <= 1)

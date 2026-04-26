@@ -25,7 +25,7 @@ namespace SkeletonAutoPatch
                 if (stringData)
                 {
                     auto characterName = stringData->name.c_str();
-                    if (characterName && characterName[0] != '\0' && (strcmp(characterName, "FirstPerson") == 0))
+                    if (characterName && characterName[0] != '\0' && (strcmpi(characterName, "FirstPerson") == 0))
                     {
                         SKSE::log::info("Skipping Bone Switch Generator Activate for FirstPerson");
                         return;
@@ -82,7 +82,7 @@ namespace SkeletonAutoPatch
                 if (stringData)
                 {
                     auto characterName = stringData->name.c_str();
-                    if (characterName && characterName[0] != '\0' && (strcmp(characterName, "FirstPerson") == 0))
+                    if (characterName && characterName[0] != '\0' && (strcmpi(characterName, "FirstPerson") == 0))
                     {
                         SKSE::log::info("Skipping Bone Switch Generator Activate for FirstPerson");
                         return;

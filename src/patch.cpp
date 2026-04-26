@@ -44,12 +44,12 @@ namespace SkeletonAutoPatch
                 auto characterName = stringData->name.c_str();
                 if (characterName && characterName[0] != '\0')
                 {
-                    if ( (strcmp(characterName, "FirstPerson") == 0))
+                    if ( (strcmpi(characterName, "FirstPerson") == 0))
                     {
                         SKSE::log::info("Skipping Patch Character for FirstPerson");
                         return false;
                     }
-                    if ((strcmp(characterName, "DefaultMale") == 0) || (strcmp(characterName, "DefaultFemale") == 0))
+                    if ((strcmpi(characterName, "DefaultMale") == 0) || (strcmpi(characterName, "DefaultFemale") == 0))
                     {
                         humanoid = true; 
                     }

@@ -32,6 +32,8 @@ add_rules("plugin.vsxmake.autoupdate")
 -- include custom rules
 includes("xmake-rules.lua")
 
+add_requires("safetyhook")
+
 
 -- targets
 target(name)
@@ -57,3 +59,5 @@ target(name)
     add_headerfiles("src/**.h")
     add_includedirs("src")
     set_pcxxheader("src/pch.h")
+
+    add_packages("safetyhook")

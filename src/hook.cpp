@@ -3,6 +3,7 @@
 #include "RE/H/hkbBoneWeightArray.h"
 #include "RE/H/hkClass.h"
 #include "RE/H/hkbVariableBindingSet.h"
+#include "RE/H/hkRootLevelContainer.h"
 #include "patch.h"
 namespace SkeletonAutoPatch
 {
@@ -249,5 +250,28 @@ namespace SkeletonAutoPatch
         auto *animationFilename = animationBundleNames[bindingIndex].data();
         SKSE::log::info("Unloaded animation {}, Queued animations {}, Loaded animations {} Result {}", animationFilename, a_animationFileManager->queuedAnimations.size(), a_animationFileManager->loadedAnimations.size(), result);
         return result;
+    }
+    void *BSAssetLoaderHook::LoadAsset(uint64_t loader, const char *rootPath, const char *filename, const RE::hkClass &refClass)
+    {
+        if (_strcmpi(refClass.name, "hkbCharacter") == 0)
+        {
+            auto* character = _LoadAsset.call<RE::hkbCharacter*>(loader, rootPath, filename, refClass);
+            if (character)
+            {
+                _character = RE::hkRefPtr<RE::hkbCharacter>(character);
+                SKSE::log::info("Loaded hkbCharacter {}", filename);
+            }
+            return character;
+        }
+        else if (_strcmpi(refClass.name, "hkRootLevelContainer") == 0 && !_character)
+        {
+            auto* container = _LoadAsset.call<RE::hkRootLevelContainer*>(loader, rootPath, filename, refClass);
+            if (container)
+            {
+                SKSE::log::info("Loaded hkRootLevelContainer {}", filename);
+            }
+            return container;
+        }
+        return _LoadAsset.call<void*>(loader, rootPath, filename, refClass);
     }
 }

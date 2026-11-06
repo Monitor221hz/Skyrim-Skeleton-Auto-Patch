@@ -3,6 +3,7 @@
 #include "RE/H/hkbBlenderGenerator.h"
 #include "RE/H/hkClass.h"
 #include "RE/A/AnimationFileManagerSingleton.h"
+#include "safetyhook.hpp"
 namespace SkeletonAutoPatch
 {
     class BlenderGeneratorActivateHook
@@ -101,10 +102,26 @@ Down	o	.pdata:000000014353E014	RUNTIME_FUNCTION <rva hkbCharacterSetup__sub_140A
 
     };
 
+    class BSAssetLoaderHook
+    {
+        public: 
+        static void Install()
+        {
+            REL::Relocation<std::uintptr_t> target { REL::RelocationID(62950, 0)}; 
+            _LoadAsset = safetyhook::create_inline(target.address(), &LoadAsset); 
+        }
+        private: 
+        static void* LoadAsset(uint64_t loader, const char* rootPath, const char* filename, const RE::hkClass& refClass);
+
+        static inline RE::hkRefPtr<RE::hkbCharacter> _character;
+        static inline SafetyHookInline _LoadAsset;
+    }; 
+
+
     static void InstallHooks()
     {
         // SKSE::AllocTrampoline(14); 
-        InitHavokHook::Install();
+        // InitHavokHook::Install();
         // BlenderGeneratorActivateHook::Install();
         // BoneSwitchActivateHook::Install();
         // AnimationFileManagerHook::Install();
